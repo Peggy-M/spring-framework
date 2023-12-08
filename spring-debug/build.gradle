@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.peppa'
+version = '5.2.26.BUILD-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile(project(":spring-beans"))
+    compile(project(":spring-core"))
+    compile(project(":spring-context"))
+    compile(project(":spring-webmvc"))
+    compile(project(":spring-jdbc"))
+    compile(project(":spring-orm"))
+    compile(project(":spring-tx"))
+    compile(project(":spring-web"))
+    compile(project(":spring-context-indexer"))
+    compile(project(":spring-context-support"))
+    compile(project(":spring-expression"))
+    compile(project(":spring-instrument"))
+    compile(project(":spring-jcl"))
+    compile(project(":spring-jms"))
+    compile(project(":spring-messaging"))
+    compile(project(":spring-oxm"))
+    compile(project(":spring-test"))
+    compile(project(":spring-webflux"))
+    compile(project(":spring-websocket"))
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
