@@ -1,7 +1,9 @@
 package com.peppa;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 public class Main {
 	public static void main(String[] args) {
-		System.out.println("Hello world!");
+		ClassPathXmlApplicationContext application = new ClassPathXmlApplicationContext("application.xml");
 	}
 }
