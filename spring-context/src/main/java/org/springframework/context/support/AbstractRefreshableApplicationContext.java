@@ -125,10 +125,10 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			closeBeanFactory();
 		}
 		try {
-			DefaultListableBeanFactory beanFactory = createBeanFactory(); // 创建 bean 工厂
-			beanFactory.setSerializationId(getId());
-			customizeBeanFactory(beanFactory);
-			loadBeanDefinitions(beanFactory);
+			DefaultListableBeanFactory beanFactory = createBeanFactory(); // 创建 DefaultListableBeanFactory 工厂对象
+			beanFactory.setSerializationId(getId()); // 设置序列化 id
+			customizeBeanFactory(beanFactory); // 设置参数值
+			loadBeanDefinitions(beanFactory); // 加载 bean 定义(读取 xml 配置文件中的信息)
 			this.beanFactory = beanFactory;
 		}
 		catch (IOException ex) {
@@ -214,6 +214,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+		// 在设置 xml 文件当中的标签时  lookup-method / replaced-method
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
