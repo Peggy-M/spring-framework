@@ -19,6 +19,11 @@ package org.springframework.beans.factory;
 import org.springframework.lang.Nullable;
 
 /**
+ * 父子容器的层级关系【spring-mvc】
+ * 在 doGetBean 当中首先会获取父工程进行判断
+ * Check if bean definition exists in this factory.
+ * BeanFactory parentBeanFactory = getParentBeanFactory();
+ * 由 Bean 工厂实现的子接口，可以是层次结构的一部分。
  * Sub-interface implemented by bean factories that can be part
  * of a hierarchy.
  *

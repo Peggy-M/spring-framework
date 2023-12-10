@@ -517,10 +517,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
-			prepareRefresh();
+			prepareRefresh(); // 准备工作
 
 			// Tell the subclass to refresh the internal bean factory.
-			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory(); // 获取一个刷新的 bean 容器 (beanFactory)
 
 			// Prepare the bean factory for use in this context.
 			prepareBeanFactory(beanFactory);
@@ -604,8 +604,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// see ConfigurablePropertyResolver#setRequiredProperties
 		getEnvironment().validateRequiredProperties(); // 创建并获取当前环境对象，验证需要的属性是否已经放入到了环境当中
 
-		// Store pre-refresh ApplicationListeners...
+		// Store pre-refresh ApplicationListeners... // 创建一些简单的集合类
 		if (this.earlyApplicationListeners == null) {
+			// 在 SpringBoot 当中的 this.applicationListeners 默认的监听器集合不为空
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
 		else {

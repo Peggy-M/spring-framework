@@ -24,6 +24,9 @@ import org.springframework.core.ResolvableType;
 import org.springframework.lang.Nullable;
 
 /**
+ * 根据各种条件获取 bean 的配置清单
+ * 扩展 {@link BeanFactory} 接口，由 Bean 工厂实现，可以枚举其所有 Bean 实例，而不是根据客户端的要求逐个尝试按名称逐个查找 Bean。
+ * 预加载所有 Bean 定义的 BeanFactory 实现（例如基于 XML 的工厂）可以实现此接口。
  * Extension of the {@link BeanFactory} interface to be implemented by bean factories
  * that can enumerate all their bean instances, rather than attempting bean lookup
  * by name one by one as requested by clients. BeanFactory implementations that
