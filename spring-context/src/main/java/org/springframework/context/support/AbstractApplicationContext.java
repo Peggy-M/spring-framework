@@ -315,7 +315,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	@Override
 	public ConfigurableEnvironment getEnvironment() {
-		if (this.environment == null) {
+		if (this.environment == null) { // 首次进入当前的环境为空
 			this.environment = createEnvironment();
 		}
 		return this.environment;
@@ -584,11 +584,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareRefresh() {
 		// Switch to active.
-		this.startupDate = System.currentTimeMillis();
-		this.closed.set(false);
-		this.active.set(true);
+		this.startupDate = System.currentTimeMillis(); // 设置容器启动的时间
+		this.closed.set(false); // 设置容器的关闭标志位
+		this.active.set(true); // 设置容器的激活标志位（活跃的原子标志位）
 
-		if (logger.isDebugEnabled()) {
+		if (logger.isDebugEnabled()) { // 日志记录
 			if (logger.isTraceEnabled()) {
 				logger.trace("Refreshing " + this);
 			}
@@ -598,11 +598,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
-		initPropertySources();
+		initPropertySources(); // 空实现留给子类覆盖
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
-		getEnvironment().validateRequiredProperties();
+		getEnvironment().validateRequiredProperties(); // 创建并获取当前环境对象，验证需要的属性是否已经放入到了环境当中
 
 		// Store pre-refresh ApplicationListeners...
 		if (this.earlyApplicationListeners == null) {
