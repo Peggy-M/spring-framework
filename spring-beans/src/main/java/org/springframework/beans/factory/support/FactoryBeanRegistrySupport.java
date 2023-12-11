@@ -132,7 +132,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 			}
 		}
 		else {
-			Object object = doGetObjectFromFactoryBean(factory, beanName);
+			Object object = doGetObjectFromFactoryBean(factory, beanName); // 从 factoryBean 工厂当中获取 bean 对象
 			if (shouldPostProcess) {
 				try {
 					object = postProcessObjectFromFactoryBean(object, beanName);
@@ -166,7 +166,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 				}
 			}
 			else {
-				object = factory.getObject();
+				object = factory.getObject(); // 直接调用 getObject 方法,返回具体的 bean 对象
 			}
 		}
 		catch (FactoryBeanNotInitializedException ex) {

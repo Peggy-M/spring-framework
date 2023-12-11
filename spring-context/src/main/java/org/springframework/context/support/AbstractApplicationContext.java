@@ -538,7 +538,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
-				initMessageSource();
+				initMessageSource(); // 国际化
 
 				// Initialize event multicaster for this context.
 				initApplicationEventMulticaster();
@@ -550,10 +550,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
-				finishBeanFactoryInitialization(beanFactory);
+				finishBeanFactoryInitialization(beanFactory); // 实例化剩下的非懒加载的对象
 
 				// Last step: publish corresponding event.
-				finishRefresh();
+				finishRefresh(); // 完成整体的刷新
 			}
 
 			catch (BeansException ex) {
@@ -877,10 +877,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.setTempClassLoader(null);
 
 		// Allow for caching all bean definition metadata, not expecting further changes.
-		beanFactory.freezeConfiguration();
+		beanFactory.freezeConfiguration(); // 如何一些 bean 不允许修改了,放到该里面
 
 		// Instantiate all remaining (non-lazy-init) singletons.
-		beanFactory.preInstantiateSingletons();
+		beanFactory.preInstantiateSingletons(); // 实例化所有的剩下非懒加载的单例
 	}
 
 	/**
