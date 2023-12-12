@@ -84,8 +84,8 @@ public class PluggableSchemaResolver implements EntityResolver {
 	 * @see PropertiesLoaderUtils#loadAllProperties(String, ClassLoader)
 	 */
 	public PluggableSchemaResolver(@Nullable ClassLoader classLoader) {
-		this.classLoader = classLoader;
-		this.schemaMappingsLocation = DEFAULT_SCHEMA_MAPPINGS_LOCATION;
+		this.classLoader = classLoader; // 类加载器
+		this.schemaMappingsLocation = DEFAULT_SCHEMA_MAPPINGS_LOCATION; // xsd 文件的默认路径 【META-INF/spring.schemas】 从 jar 包中找到 xsd 读取文件
 	}
 
 	/**
@@ -113,6 +113,8 @@ public class PluggableSchemaResolver implements EntityResolver {
 		}
 
 		if (systemId != null) {
+			// 默认懒加载的只有第一次调用 getSchemaMappings() 的时候才会给 schemaMappings 赋值的
+			// 而之所以在进行 idea debug 的时候会有值,是因为在 toString 中显示的调用了  getSchemaMappings() 方法,所以就会赋值 .
 			String resourceLocation = getSchemaMappings().get(systemId);
 			if (resourceLocation == null && systemId.startsWith("https:")) {
 				// Retrieve canonical http schema mapping even for https declaration
