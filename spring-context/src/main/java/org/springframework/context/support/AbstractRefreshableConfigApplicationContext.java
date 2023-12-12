@@ -39,6 +39,7 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
 
+	// 这里定义的默认配置路径,不单单只是在这里解析 xml 路径名的时候使用, 在后面配置文件的解析依然会用到
 	@Nullable
 	private String[] configLocations;
 
@@ -73,12 +74,14 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * Set the config locations for this application context.
 	 * <p>If not set, the implementation may use a default as appropriate.
 	 */
+	// 记住这个类名 AbstractRefreshableConfigApplicationContext 这里的 String[] configLocations 属性不单单只是在这里使用,在后面的配置文件解析同样会用到
 	public void setConfigLocations(@Nullable String... locations) {
 		if (locations != null) {
 			Assert.noNullElements(locations, "Config locations must not be null");
 			this.configLocations = new String[locations.length];
-			for (int i = 0; i < locations.length; i++) {
-				this.configLocations[i] = resolvePath(locations[i]).trim();
+			for (int i = 0; i < locations.length; i++) { // 这里可能有多个配置文件路径
+				// 思考【我们有没有在配置文件文件中写过 ${jdbc.url},${jdbc.username}】 既然名字是这样解析的,那么 xml 配置文件中的 是不是也是这样的呢 ? 【功能复用】
+				this.configLocations[i] = resolvePath(locations[i]).trim(); // 解析给定的路径【比如解析 spring-${username}.xml这方式】
 			}
 		}
 		else {
@@ -122,7 +125,9 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * @see org.springframework.core.env.Environment#resolveRequiredPlaceholders(String)
 	 */
 	protected String resolvePath(String path) {
-		return getEnvironment().resolveRequiredPlaceholders(path); // getEnvironment() 第一个获取当前系统环境变量
+		// getEnvironment() 第一个获取当前系统环境变量的值,为替换做准备
+		// resolveRequiredPlaceholders(path) 解析必要的占位符[${xxxx}],进行替换
+		return getEnvironment().resolveRequiredPlaceholders(path);
 	}
 
 

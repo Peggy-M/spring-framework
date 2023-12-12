@@ -164,7 +164,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	protected final Log logger = LogFactory.getLog(getClass());
 
 	/** Unique id for this context, if any. */
-	private String id = ObjectUtils.identityToString(this);
+	private String id = ObjectUtils.identityToString(this); // 启动容器的时候分配的唯一 id 值,在之前的 creatBeanFactory 的时候有一个 序列化 id 该就是唯一的启动启动 id
 
 	/** Display name. */
 	private String displayName = ObjectUtils.identityToString(this);
@@ -190,7 +190,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	private final AtomicBoolean closed = new AtomicBoolean();
 
 	/** Synchronization monitor for the "refresh" and "destroy". */
-	private final Object startupShutdownMonitor = new Object();
+	private final Object startupShutdownMonitor = new Object(); // 同步监视器, 刷新 refresh 与 destroy 容器的时候是一个过程,不允许被中断
 
 	/** Reference to the JVM shutdown hook, if registered. */
 	@Nullable
@@ -226,8 +226,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Create a new AbstractApplicationContext with no parent.
 	 */
-	public AbstractApplicationContext() {
-		this.resourcePatternResolver = getResourcePatternResolver();
+	public AbstractApplicationContext() { // 用于解析当前系统的资源【xml,配置文件都属于资源】
+		this.resourcePatternResolver = getResourcePatternResolver(); // 创建资源模式处理器(refresh()方法就在此类当中)
 	}
 
 	/**
@@ -456,6 +456,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see org.springframework.core.io.support.PathMatchingResourcePatternResolver
 	 */
 	protected ResourcePatternResolver getResourcePatternResolver() {
+		// 创建一个资源模式解析器 (其实就是用于解析 xml 配置文件)
 		return new PathMatchingResourcePatternResolver(this);
 	}
 
@@ -475,10 +476,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void setParent(@Nullable ApplicationContext parent) {
 		this.parent = parent;
-		if (parent != null) {
-			Environment parentEnvironment = parent.getEnvironment();
-			if (parentEnvironment instanceof ConfigurableEnvironment) {
-				getEnvironment().merge((ConfigurableEnvironment) parentEnvironment);
+		if (parent != null) { // 在当前的 spring 项目当中,看不到【父子容器】的概念,如果进入到 spring-mvc 的时候就会出现父子容器
+			Environment parentEnvironment = parent.getEnvironment(); // 如果父容器不为空,获取父容器的环境对象
+			if (parentEnvironment instanceof ConfigurableEnvironment) { // 如果当前的环境对象是一个可配置的环境对象
+				getEnvironment().merge((ConfigurableEnvironment) parentEnvironment); // 进行相关的一个合并工作
 			}
 		}
 	}
@@ -588,7 +589,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Switch to active.
 		this.startupDate = System.currentTimeMillis(); // 设置容器启动的时间
 		this.closed.set(false); // 设置容器的关闭标志位
-		this.active.set(true); // 设置容器的激活标志位（活跃的原子标志位）
+		this.active.set(true); // 设置容器的激活标志位（活跃的原子标志位） 【 当前容器的关闭标志位为 false 激活标志位 true 表示该容器目前正在运行 】
 
 		if (logger.isDebugEnabled()) { // 日志记录
 			if (logger.isTraceEnabled()) {
@@ -600,7 +601,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Initialize any placeholder property sources in the context environment.
-		initPropertySources(); // 空实现留给子类覆盖
+		// 空实现留给子类覆盖 【初始化资源属性】
+		// 如果这里我们自己扩展我们会怎么做 ? 继承父类 ClassPathXmlApplicationContext 重写 initPropertySources 方法, 比如对刚才解析当中获取的系统属性进行验证
+		initPropertySources();
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties

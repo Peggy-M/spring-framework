@@ -129,16 +129,16 @@ public class PropertyPlaceholderHelper {
 	protected String parseStringValue(
 			String value, PlaceholderResolver placeholderResolver, @Nullable Set<String> visitedPlaceholders) {
 
-		int startIndex = value.indexOf(this.placeholderPrefix);
+		int startIndex = value.indexOf(this.placeholderPrefix); // 获取占位符前缀 [${] 的下标位置
 		if (startIndex == -1) {
 			return value;
 		}
 
 		StringBuilder result = new StringBuilder(value);
 		while (startIndex != -1) {
-			int endIndex = findPlaceholderEndIndex(result, startIndex);
+			int endIndex = findPlaceholderEndIndex(result, startIndex); // 查找占位符结束的下标位置
 			if (endIndex != -1) {
-				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex);
+				String placeholder = result.substring(startIndex + this.placeholderPrefix.length(), endIndex); // 截取占位符中的属性
 				String originalPlaceholder = placeholder;
 				if (visitedPlaceholders == null) {
 					visitedPlaceholders = new HashSet<>(4);
@@ -148,9 +148,9 @@ public class PropertyPlaceholderHelper {
 							"Circular placeholder reference '" + originalPlaceholder + "' in property definitions");
 				}
 				// Recursive invocation, parsing placeholders contained in the placeholder key.
-				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders);
+				placeholder = parseStringValue(placeholder, placeholderResolver, visitedPlaceholders); // 递归调用截取第一个占位符包含的字符串可能会包含  os-${username}}
 				// Now obtain the value for the fully resolved key...
-				String propVal = placeholderResolver.resolvePlaceholder(placeholder);
+				String propVal = placeholderResolver.resolvePlaceholder(placeholder); // 从系统中获取对应的解析到的属性
 				if (propVal == null && this.valueSeparator != null) {
 					int separatorIndex = placeholder.indexOf(this.valueSeparator);
 					if (separatorIndex != -1) {
@@ -165,8 +165,8 @@ public class PropertyPlaceholderHelper {
 				if (propVal != null) {
 					// Recursive invocation, parsing placeholders contained in the
 					// previously resolved placeholder value.
-					propVal = parseStringValue(propVal, placeholderResolver, visitedPlaceholders);
-					result.replace(startIndex, endIndex + this.placeholderSuffix.length(), propVal);
+					propVal = parseStringValue(propVal, placeholderResolver, visitedPlaceholders); // 解析到占位符
+					result.replace(startIndex, endIndex + this.placeholderSuffix.length(), propVal); //占位符替换
 					if (logger.isTraceEnabled()) {
 						logger.trace("Resolved placeholder '" + placeholder + "'");
 					}
@@ -180,6 +180,7 @@ public class PropertyPlaceholderHelper {
 					throw new IllegalArgumentException("Could not resolve placeholder '" +
 							placeholder + "'" + " in value \"" + value + "\"");
 				}
+				//删除集合当中的解析元素 spring-${username}.xml
 				visitedPlaceholders.remove(originalPlaceholder);
 			}
 			else {
@@ -190,10 +191,10 @@ public class PropertyPlaceholderHelper {
 	}
 
 	private int findPlaceholderEndIndex(CharSequence buf, int startIndex) {
-		int index = startIndex + this.placeholderPrefix.length();
+		int index = startIndex + this.placeholderPrefix.length(); // 占位符开始的位置 + 前缀索引的长度
 		int withinNestedPlaceholder = 0;
 		while (index < buf.length()) {
-			if (StringUtils.substringMatch(buf, index, this.placeholderSuffix)) {
+			if (StringUtils.substringMatch(buf, index, this.placeholderSuffix)) { // 判断当前的下一个字符是否出现了后缀 [}]
 				if (withinNestedPlaceholder > 0) {
 					withinNestedPlaceholder--;
 					index = index + this.placeholderSuffix.length();
@@ -202,7 +203,7 @@ public class PropertyPlaceholderHelper {
 					return index;
 				}
 			}
-			else if (StringUtils.substringMatch(buf, index, this.simplePrefix)) {
+			else if (StringUtils.substringMatch(buf, index, this.simplePrefix)) { // 如果没有出现则判断是否出现新的占位符 [{] ,该种情况主要用于判断是否出现类似于 [spring-${os-${username}}.xml] 占位符嵌套
 				withinNestedPlaceholder++;
 				index = index + this.simplePrefix.length();
 			}

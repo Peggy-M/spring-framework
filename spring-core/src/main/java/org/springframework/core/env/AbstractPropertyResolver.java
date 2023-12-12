@@ -205,9 +205,10 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 	@Override
 	public String resolveRequiredPlaceholders(String text) throws IllegalArgumentException {
 		if (this.strictHelper == null) {
+			// 占位符的助手 [前缀 ${ 后缀 } 分隔符 :]
 			this.strictHelper = createPlaceholderHelper(false);
 		}
-		return doResolvePlaceholders(text, this.strictHelper);
+		return doResolvePlaceholders(text, this.strictHelper); // 开始解析
 	}
 
 	/**
