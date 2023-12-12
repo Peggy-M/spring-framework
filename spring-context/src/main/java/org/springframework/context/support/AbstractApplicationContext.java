@@ -607,22 +607,29 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Validate that all properties marked as required are resolvable:
 		// see ConfigurablePropertyResolver#setRequiredProperties
-		getEnvironment().validateRequiredProperties(); // 创建并获取当前环境对象，验证需要的属性是否已经放入到了环境当中
+		// 之前已经在解析配置文件路径的时候已经创建并获取过系统环境属性,所以这里的 Environment 不为空
+		getEnvironment().validateRequiredProperties();
 
-		// Store pre-refresh ApplicationListeners... // 创建一些简单的集合类
-		if (this.earlyApplicationListeners == null) {
-			// 在 SpringBoot 当中的 this.applicationListeners 默认的监听器集合不为空
+		// Store pre-refresh ApplicationListeners...
+		// 创建一些简单的集合类
+		// earlyApplicationListeners 应用程序监听器  earlyApplicationEvents 应用程序监听事件 这两个集合在初期是没有对象的
+		// 因此这里需要添加给分别创建对象
+		if (this.earlyApplicationListeners == null) { // 监听器集合
+			// 这里虽然初始状态监听器集合与监听事件集合都是为空的
+			// 但是在 SpringBoot 当中的 this.applicationListeners 默认的监听器集合不为空
+			// 因为在 SpringBoot 当中的 spring.factories 配置文件当中,有 15 个 listener 而这些 listener 会在加载的时候回提前读取加载到容器内
 			this.earlyApplicationListeners = new LinkedHashSet<>(this.applicationListeners);
 		}
 		else {
 			// Reset local application listeners to pre-refresh state.
+			// 如果监听器集合不为空,则清空 监听器集合
 			this.applicationListeners.clear();
 			this.applicationListeners.addAll(this.earlyApplicationListeners);
 		}
 
 		// Allow for the collection of early ApplicationEvents,
 		// to be published once the multicaster is available...
-		this.earlyApplicationEvents = new LinkedHashSet<>();
+		this.earlyApplicationEvents = new LinkedHashSet<>(); // 监听事件集合
 	}
 
 	/**
@@ -641,6 +648,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		// 如果存在则【销毁 bean 工厂】 初始化 beanFactory 并进行 xml 文件读取,并将得到的 beanFactory 记录在当前实体的属性当中
+		// 为什么可能会有多余的 bean 工厂 ?
+		// 因为在刚刚启动的时候是以一个 ClassPathXmlApplicationContext 这样的方式启动 application
+		// 而在 web 项目当中我们是没有写过 new ClassPathXmlApplicationContext("xxx.xml") 这样的代码的
+		// 但是如果是一个 web 项目的时候,就会有一个 web 的工厂。我们是没有看到一个 main 方法的.我们是直接通过 TomCatServer 启动的
+		// spring 只是一个底子,上层有 spring-mvc spring-boot spring-cloud
+		// 刷新 bean 工厂 。思考【为什么要刷新 bean 工厂 ? 】
 		refreshBeanFactory();
 		return getBeanFactory();
 	}

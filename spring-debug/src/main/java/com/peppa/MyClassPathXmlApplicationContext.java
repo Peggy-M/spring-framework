@@ -1,5 +1,6 @@
 package com.peppa;
 
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -15,6 +16,13 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 	protected void initPropertySources() {
 		System.out.println("调用扩展的 intiPropertySources 方法");
 		// 获取当前系统环境并添加 peppa 属性
-		getEnvironment().setRequiredProperties("peppa");
+//		getEnvironment().setRequiredProperties("peppa");
+	}
+
+	@Override
+	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+		super.setAllowBeanDefinitionOverriding(false);
+		super.setAllowCircularReferences(false);
+		super.customizeBeanFactory(beanFactory);
 	}
 }

@@ -120,14 +120,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/** ClassLoader to resolve bean class names with, if necessary. */
 	@Nullable
-	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
+	private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader(); // 类加载器,处理 bean 的名称
 
 	/** ClassLoader to temporarily resolve bean class names with, if necessary. */
 	@Nullable
 	private ClassLoader tempClassLoader;
 
 	/** Whether to cache bean metadata or rather reobtain it for every access. */
-	private boolean cacheBeanMetadata = true;
+	private boolean cacheBeanMetadata = true; // 是否缓存 bean 的元数据信息
 
 	/** Resolution strategy for expressions in bean definition values. */
 	@Nullable

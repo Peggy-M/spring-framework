@@ -119,15 +119,14 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
-		// 如果存在则销毁 bean 工厂
-		if (hasBeanFactory()) {
-			destroyBeans();
-			closeBeanFactory();
+		if (hasBeanFactory()) { // 判断是否存在 beanFactory
+			destroyBeans(); // 销毁创建的 bean
+			closeBeanFactory(); // 关闭之前的 beanFacotry
 		}
 		try {
 			DefaultListableBeanFactory beanFactory = createBeanFactory(); // 创建 DefaultListableBeanFactory 工厂对象
 			beanFactory.setSerializationId(getId()); // 设置序列化 id (在调用最终的父类构造方法的时候分配一个默认的 id)
-			customizeBeanFactory(beanFactory); // 设置参数值
+			customizeBeanFactory(beanFactory); // 设置参数值 【自定义扩展可以修改 allowBeanDefinitionOverriding - allowCircularReferences】
 			loadBeanDefinitions(beanFactory); // 加载 bean 定义(读取 xml 配置文件中的信息)
 			this.beanFactory = beanFactory;
 		}
@@ -196,6 +195,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	protected DefaultListableBeanFactory createBeanFactory() {
 		// 创建了一个在之前类图看到的 denfaultListableBeanFactory
+		// getInternalParentBeanFactory() 获取父类的构造方法
 		return new DefaultListableBeanFactory(getInternalParentBeanFactory());
 	}
 
@@ -215,9 +215,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 */
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
 		// 在设置 xml 文件当中的标签时  lookup-method / replaced-method
+		// 如果属性 allowBeanDefinitionOverriding 不为空, 设置给 beanFactory 对象属性相应属性,是否允许覆盖同名称的不同定义的对象
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+		// 如果属性 allowCircularReferences 不为空, 设置 beanFactory 对象响应属性, 是否允许 bean 之间循环依赖
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}

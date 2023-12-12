@@ -142,13 +142,16 @@ public abstract class AbstractPropertyResolver implements ConfigurablePropertyRe
 
 	@Override
 	public void validateRequiredProperties() {
-		MissingRequiredPropertiesException ex = new MissingRequiredPropertiesException();
+		MissingRequiredPropertiesException ex = new MissingRequiredPropertiesException(); // 创建一个异常类
+		// 如果在自定义的 MyClassPathXmlApplicationContext 当中已经设置过 getEnvironment().setRequiredProperties("peppa");
+		// 则 this.requiredProperties 的值不为 NULL 便会将属性添加到集合当中
 		for (String key : this.requiredProperties) {
-			if (this.getProperty(key) == null) {
+			if (this.getProperty(key) == null) {  // 会从系统中寻找,如果没有找到则会添加一个异常
 				ex.addMissingRequiredProperty(key);
 			}
 		}
-		if (!ex.getMissingRequiredProperties().isEmpty()) {
+		// 异常信息: "The following properties were declared as required but could not be resolved: " + getMissingRequiredProperties();
+		if (!ex.getMissingRequiredProperties().isEmpty()) { // 异常默认为 0 ,如果系统中在上一个 if 判断中不存在就会添加到集合当中,此时就会报错
 			throw ex;
 		}
 	}
