@@ -93,7 +93,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	@Override
 	public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext) {
 		this.readerContext = readerContext;
-		doRegisterBeanDefinitions(doc.getDocumentElement());
+		doRegisterBeanDefinitions(doc.getDocumentElement()); // getDocumentElement 首先获取第一级的标签
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		BeanDefinitionParserDelegate parent = this.delegate;
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
-		if (this.delegate.isDefaultNamespace(root)) {
+		if (this.delegate.isDefaultNamespace(root)) { // 创建委托进行标签元素的解析
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
@@ -145,9 +145,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 			}
 		}
 
-		preProcessXml(root);
-		parseBeanDefinitions(root, this.delegate);
-		postProcessXml(root);
+		preProcessXml(root); // 预处理
+		parseBeanDefinitions(root, this.delegate); // 重点 利用委托创建的解析器 this.delegate 从根节点开始一层一层的进行解析
+		postProcessXml(root); // 后置处理
 
 		this.delegate = parent;
 	}
@@ -166,17 +166,17 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * @param root the DOM root element of the document
 	 */
 	protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
-		if (delegate.isDefaultNamespace(root)) {
-			NodeList nl = root.getChildNodes();
-			for (int i = 0; i < nl.getLength(); i++) {
-				Node node = nl.item(i);
-				if (node instanceof Element) {
-					Element ele = (Element) node;
-					if (delegate.isDefaultNamespace(ele)) {
+		if (delegate.isDefaultNamespace(root)) { // 判断是否是默认的命令空间 【一般来说 spring 的命名空间都是默认的】
+			NodeList nl = root.getChildNodes(); // 获取第一个子节点
+			for (int i = 0; i < nl.getLength(); i++) { // 获取子节点的节点个数
+				Node node = nl.item(i); // 获取
+				if (node instanceof Element) { // 判断当前节点是否是一个元素 [bean or property or beans]
+					Element ele = (Element) node; // 转化当前节点为 Element 元素
+					if (delegate.isDefaultNamespace(ele)) { // 判断当前元素是否是默认的命名空间当中的元素
 						parseDefaultElement(ele, delegate);
 					}
 					else {
-						delegate.parseCustomElement(ele);
+						delegate.parseCustomElement(ele); // 如果时自定义的标签解析
 					}
 				}
 			}
@@ -303,12 +303,15 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	 * and registering it with the registry.
 	 */
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
-		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
+		// beanDefinitionHolder 是 beanDefinition 对象的封装类, 封装了 BeanDefinition , bean 的名字和别名,用它来完成想 IOC 容器的注册
+		// 得到这个 beanDefinitionHolder 就意味着 beandefinition 是通过 BeanDefinitionParserDelegate 对 xml 元素信息按照 spring 的 bean 规则进行
+		// 解析得到的
+		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele); // 开始 bean 的解析
 		if (bdHolder != null) {
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				// Register the final decorated instance.
-				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry());
+				BeanDefinitionReaderUtils.registerBeanDefinition(bdHolder, getReaderContext().getRegistry()); // 解析得到后,完成注册
 			}
 			catch (BeanDefinitionStoreException ex) {
 				getReaderContext().error("Failed to register bean definition with name '" +

@@ -7,4 +7,5 @@
 		<property name="name" value="kakarote"/>
 		<property name="age" value="18"/>
 	</bean>
+
 </beans>

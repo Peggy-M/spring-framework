@@ -655,7 +655,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// 但是如果是一个 web 项目的时候,就会有一个 web 的工厂。我们是没有看到一个 main 方法的.我们是直接通过 TomCatServer 启动的
 		// spring 只是一个底子,上层有 spring-mvc spring-boot spring-cloud
 		// 刷新 bean 工厂 。思考【为什么要刷新 bean 工厂 ? 】
-		refreshBeanFactory();
+		refreshBeanFactory(); 
 		return getBeanFactory();
 	}
 

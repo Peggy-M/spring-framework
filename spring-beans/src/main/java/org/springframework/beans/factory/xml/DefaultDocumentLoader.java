@@ -74,6 +74,7 @@ public class DefaultDocumentLoader implements DocumentLoader {
 			logger.trace("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
+		// 至于这里是如何将 XML 文件解析构建成一个 Document 对象的这里就不深究了,想看也可以吃自己去查找一下。
 		return builder.parse(inputSource);
 	}
 

@@ -124,7 +124,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			closeBeanFactory(); // 关闭之前的 beanFacotry
 		}
 		try {
-			DefaultListableBeanFactory beanFactory = createBeanFactory(); // 创建 DefaultListableBeanFactory 工厂对象
+			DefaultListableBeanFactory beanFactory = createBeanFactory(); // 创建 DefaultListableBeanFactory 工厂对象,该对象目前只是一个初始空值
 			beanFactory.setSerializationId(getId()); // 设置序列化 id (在调用最终的父类构造方法的时候分配一个默认的 id)
 			customizeBeanFactory(beanFactory); // 设置参数值 【自定义扩展可以修改 allowBeanDefinitionOverriding - allowCircularReferences】
 			// loadBeanDefinitions 这个方法当中涉及到非常复杂的重载方法调用,内容相当多

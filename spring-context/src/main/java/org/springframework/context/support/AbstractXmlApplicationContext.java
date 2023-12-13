@@ -93,6 +93,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 		// Allow a subclass to provide custom initialization of the reader,
 		// then proceed with actually loading the bean definitions.
 		initBeanDefinitionReader(beanDefinitionReader);
+		//前面几部已经获取了环境属性,设置 xml 加载解析方式的格式 xsd & dtd 的解析路径,初始化好了资源解析器, 接下来就是加载 xml 配置文件路径并完成解析工作
 		loadBeanDefinitions(beanDefinitionReader); // 重载调用
 	}
 
@@ -121,6 +122,7 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	 * @see #getResourcePatternResolver
 	 */
 	protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+		// 执行 configResources or configLocations 取决于ClassPathXMLApplicationContext 启动类当中传入的参数具体是 String or Resource 类型
 		Resource[] configResources = getConfigResources();
 		if (configResources != null) {
 			reader.loadBeanDefinitions(configResources);
