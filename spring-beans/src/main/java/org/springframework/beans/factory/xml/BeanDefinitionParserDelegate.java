@@ -402,6 +402,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele) {
+		// 解析元素并获取完整的 BeanDefinition 对象 [bean定义信息]
 		return parseBeanDefinitionElement(ele, null);
 	}
 
@@ -434,6 +435,7 @@ public class BeanDefinitionParserDelegate {
 			checkNameUniqueness(beanName, aliases, ele); // 判断当前 beanName 是否是唯一的 【在同一个 xml 配置文件可以配置多个同名的 bean 吗 ? 】
 		}
 
+		// 对 bean 元素的详细解析 这个返回 beanDefinition 是一个[完整的 beanDefinition]
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean); //
 		if (beanDefinition != null) {
 			if (!StringUtils.hasText(beanName)) {
@@ -465,7 +467,8 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
-			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
+			// 这里的 BeanDefinitionHolder 其实就是一个 BeanDefinition 的包装类,里面相比于 BeanDefinition 就多了一个 bean 的名称与 别名数组
+			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray); // 包含了 bean 的描述信息, bean 的名称, bean 的别名数组
 		}
 
 		return null;
@@ -718,6 +721,7 @@ public class BeanDefinitionParserDelegate {
 		NodeList nl = beanEle.getChildNodes();
 		for (int i = 0; i < nl.getLength(); i++) {
 			Node node = nl.item(i);
+			// 判断是否是 property 元素, 然后对其进行解析
 			if (isCandidateElement(node) && nodeNameEquals(node, PROPERTY_ELEMENT)) {
 				parsePropertyElement((Element) node, bd);
 			}
@@ -848,6 +852,7 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a property element.
 	 */
 	public void parsePropertyElement(Element ele, BeanDefinition bd) {
+		// 获取配置元素中的 name 值
 		String propertyName = ele.getAttribute(NAME_ATTRIBUTE);
 		if (!StringUtils.hasLength(propertyName)) {
 			error("Tag 'property' must have a 'name' attribute", ele);
@@ -855,10 +860,13 @@ public class BeanDefinitionParserDelegate {
 		}
 		this.parseState.push(new PropertyEntry(propertyName));
 		try {
+			// 不允许多次对统一配置,如果已经存在同名的 property 属性, 那么久不进行解析
 			if (bd.getPropertyValues().contains(propertyName)) {
 				error("Multiple 'property' definitions for property '" + propertyName + "'", ele);
 				return;
 			}
+			// 此处用来解析 property 值, 返回对象对象应的 bean 定义的 property 属性设置的解析结果, 这个解析结果会封装到 PropertyValue 对象中
+			// 然后设置到 BeanDefinitionHolder 中去
 			Object val = parsePropertyValue(ele, bd, propertyName);
 			PropertyValue pv = new PropertyValue(propertyName, val);
 			parseMetaElements(ele, pv);
@@ -958,6 +966,7 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		if (hasRefAttribute) {
+			// ref 属性的处理,使用 runtimeBeanRefercence 封装对应的 ref 名称
 			String refName = ele.getAttribute(REF_ATTRIBUTE);
 			if (!StringUtils.hasText(refName)) {
 				error(elementName + " contains empty 'ref' attribute", ele);
@@ -967,15 +976,18 @@ public class BeanDefinitionParserDelegate {
 			return ref;
 		}
 		else if (hasValueAttribute) {
+			// value 属性的处理,使用 TypedStringValue 封装
 			TypedStringValue valueHolder = new TypedStringValue(ele.getAttribute(VALUE_ATTRIBUTE));
 			valueHolder.setSource(extractSource(ele));
 			return valueHolder;
 		}
 		else if (subElement != null) {
+			// 解析子元素
 			return parsePropertySubElement(subElement, bd);
 		}
 		else {
 			// Neither child element nor "ref" or "value" attribute found.
+			// 如果既没有 ref 属性也没有 value 属性,也没有子元素,那么久会报错
 			error(elementName + " must specify a ref or value", ele);
 			return null;
 		}
@@ -1002,23 +1014,23 @@ public class BeanDefinitionParserDelegate {
 	 */
 	@Nullable
 	public Object parsePropertySubElement(Element ele, @Nullable BeanDefinition bd, @Nullable String defaultValueType) {
-		if (!isDefaultNamespace(ele)) {
+		if (!isDefaultNamespace(ele)) { // 如果时默认的命名空间如何解析
 			return parseNestedCustomElement(ele, bd);
 		}
-		else if (nodeNameEquals(ele, BEAN_ELEMENT)) {
+		else if (nodeNameEquals(ele, BEAN_ELEMENT)) { // 如果时一个 bean 元素如何解析
 			BeanDefinitionHolder nestedBd = parseBeanDefinitionElement(ele, bd);
 			if (nestedBd != null) {
 				nestedBd = decorateBeanDefinitionIfRequired(ele, nestedBd, bd);
 			}
 			return nestedBd;
 		}
-		else if (nodeNameEquals(ele, REF_ELEMENT)) {
+		else if (nodeNameEquals(ele, REF_ELEMENT)) { // 如果时一个 ref 的元素如何解析
 			// A generic reference to any name of any bean.
-			String refName = ele.getAttribute(BEAN_REF_ATTRIBUTE);
+			String refName = ele.getAttribute(BEAN_REF_ATTRIBUTE); // 获取 bean 属性
 			boolean toParent = false;
-			if (!StringUtils.hasLength(refName)) {
+			if (!StringUtils.hasLength(refName)) { // 如果存在父子引用标签
 				// A reference to the id of another bean in a parent context.
-				refName = ele.getAttribute(PARENT_REF_ATTRIBUTE);
+				refName = ele.getAttribute(PARENT_REF_ATTRIBUTE); // 则获取父级元素
 				toParent = true;
 				if (!StringUtils.hasLength(refName)) {
 					error("'bean' or 'parent' is required for <ref> element", ele);
@@ -1033,32 +1045,32 @@ public class BeanDefinitionParserDelegate {
 			ref.setSource(extractSource(ele));
 			return ref;
 		}
-		else if (nodeNameEquals(ele, IDREF_ELEMENT)) {
+		else if (nodeNameEquals(ele, IDREF_ELEMENT)) { // idref 元素
 			return parseIdRefElement(ele);
 		}
-		else if (nodeNameEquals(ele, VALUE_ELEMENT)) {
+		else if (nodeNameEquals(ele, VALUE_ELEMENT)) { // value 元素
 			return parseValueElement(ele, defaultValueType);
 		}
-		else if (nodeNameEquals(ele, NULL_ELEMENT)) {
+		else if (nodeNameEquals(ele, NULL_ELEMENT)) { // 空元素
 			// It's a distinguished null value. Let's wrap it in a TypedStringValue
 			// object in order to preserve the source location.
 			TypedStringValue nullHolder = new TypedStringValue(null);
 			nullHolder.setSource(extractSource(ele));
 			return nullHolder;
 		}
-		else if (nodeNameEquals(ele, ARRAY_ELEMENT)) {
+		else if (nodeNameEquals(ele, ARRAY_ELEMENT)) { // 数组元素
 			return parseArrayElement(ele, bd);
 		}
-		else if (nodeNameEquals(ele, LIST_ELEMENT)) {
+		else if (nodeNameEquals(ele, LIST_ELEMENT)) { // list 集合元素
 			return parseListElement(ele, bd);
 		}
-		else if (nodeNameEquals(ele, SET_ELEMENT)) {
+		else if (nodeNameEquals(ele, SET_ELEMENT)) { // set 集合元素
 			return parseSetElement(ele, bd);
 		}
-		else if (nodeNameEquals(ele, MAP_ELEMENT)) {
+		else if (nodeNameEquals(ele, MAP_ELEMENT)) { // map 集合元素
 			return parseMapElement(ele, bd);
 		}
-		else if (nodeNameEquals(ele, PROPS_ELEMENT)) {
+		else if (nodeNameEquals(ele, PROPS_ELEMENT)) { // props 元素
 			return parsePropsElement(ele);
 		}
 		else {
