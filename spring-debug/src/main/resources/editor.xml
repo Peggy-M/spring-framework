@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="customer" class="com.peppa.selfEditor.Customer">
+		<property name="address" value="彗星星球_灰星星_宅博士"/>
+		<property name="name" value="卡卡罗特"/>
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<!--		<property name="propertyEditorRegistrars">
+					<list>
+						<bean class="com.peppa.selfEditor.AddressPropertyEditorRegistrar"/>
+					</list>
+				</property>-->
+		<property name="customEditors">
+			<map>
+				<entry key="com.peppa.selfEditor.Address">
+					<value>com.peppa.selfEditor.AddressPropertyEditor</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+</beans>

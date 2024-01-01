@@ -74,15 +74,18 @@ public class OrderComparator implements Comparator<Object> {
 	}
 
 	private int doCompare(@Nullable Object o1, @Nullable Object o2, @Nullable OrderSourceProvider sourceProvider) {
+		// 判断两个对象是否实现了 PriorityOrdered 接口
 		boolean p1 = (o1 instanceof PriorityOrdered);
 		boolean p2 = (o2 instanceof PriorityOrdered);
+		// 如果 o1 实现 o2 没有实现,则 o1 在前面
 		if (p1 && !p2) {
 			return -1;
-		}
+		} // 如果 o1 没有实现, o2 实现 ,则 o2 在前面
 		else if (p2 && !p1) {
 			return 1;
 		}
 
+		// 如果 o1 与 o2 都没有实现, 或者都实现 PriorityOrdered 接口 这里的 sourceProvider 是空值 返回 Ordered.LOWEST_PRECEDENCE , Internet 的最大值
 		int i1 = getOrder(o1, sourceProvider);
 		int i2 = getOrder(o2, sourceProvider);
 		return Integer.compare(i1, i2);

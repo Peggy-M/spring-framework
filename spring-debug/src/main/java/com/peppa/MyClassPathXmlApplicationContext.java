@@ -1,5 +1,8 @@
 package com.peppa;
 
+import com.peppa.selfEditor.MyBeanPostProcessor;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -24,5 +27,12 @@ public class MyClassPathXmlApplicationContext extends ClassPathXmlApplicationCon
 		super.setAllowBeanDefinitionOverriding(false);
 		super.setAllowCircularReferences(false);
 		super.customizeBeanFactory(beanFactory);
+		super.addBeanFactoryPostProcessor(new MyBeanPostProcessor());
+	}
+
+	@Override
+	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		System.out.println("调用了自定义实现的 postProcessBeanFactory");
+		super.postProcessBeanFactory(beanFactory);
 	}
 }

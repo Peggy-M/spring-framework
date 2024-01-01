@@ -98,11 +98,11 @@ public class ResourceEditorRegistrar implements PropertyEditorRegistrar {
 	 * @see org.springframework.core.io.support.ResourceArrayPropertyEditor
 	 */
 	@Override
-	public void registerCustomEditors(PropertyEditorRegistry registry) {
+	public void registerCustomEditors(PropertyEditorRegistry registry) { // 注册自定义属性编辑器
 		ResourceEditor baseEditor = new ResourceEditor(this.resourceLoader, this.propertyResolver);
 		doRegisterEditor(registry, Resource.class, baseEditor);
 		doRegisterEditor(registry, ContextResource.class, baseEditor);
-		doRegisterEditor(registry, InputStream.class, new InputStreamEditor(baseEditor));
+		doRegisterEditor(registry, InputStream.class, new InputStreamEditor(baseEditor)); // 添加属性编辑器
 		doRegisterEditor(registry, InputSource.class, new InputSourceEditor(baseEditor));
 		doRegisterEditor(registry, File.class, new FileEditor(baseEditor));
 		doRegisterEditor(registry, Path.class, new PathEditor(baseEditor));

@@ -99,6 +99,8 @@ public abstract class AbstractApplicationEventMulticaster
 	}
 
 
+	// 实现父接口下载的监听器添加 
+	// 添加到内部类 this.defaultRetriever.applicationListeners 当中
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		synchronized (this.defaultRetriever) {
@@ -468,6 +470,7 @@ public abstract class AbstractApplicationEventMulticaster
 	 */
 	private class DefaultListenerRetriever {
 
+		// 监听器集合
 		public final Set<ApplicationListener<?>> applicationListeners = new LinkedHashSet<>();
 
 		public final Set<String> applicationListenerBeans = new LinkedHashSet<>();

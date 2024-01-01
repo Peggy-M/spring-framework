@@ -85,17 +85,24 @@ abstract class ConfigurationClassUtils {
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
 
+		// 获取类当前的 bean 的类名称
 		String className = beanDef.getBeanClassName();
+		// 当前名为空, 或者有返回一个工厂方法不为了空
 		if (className == null || beanDef.getFactoryMethodName() != null) {
 			return false;
 		}
 
-		AnnotationMetadata metadata;
+		AnnotationMetadata metadata; // 元数据注解
+		// 通过注解注入的 beanDefinition 都是 AnnotatedGenericBeanDefinition 实现了 AnnotatedBeanDefinition
+		// spring 内部的 beanDefinition 实现了 AnnotatedBeanDefinition
+		// 此处主要用于判断是否归属于 AnnotatedBeanDefinition
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
+			// 从当前 bean 的定义信息中获取元数据信息
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 		}
+		// 判断是否 spring 中默认的 BeanDefinition
 		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
 			// Check already loaded Class if present...
 			// since we possibly can't even load the class file for this Class.
@@ -106,10 +113,12 @@ abstract class ConfigurationClassUtils {
 					EventListenerFactory.class.isAssignableFrom(beanClass)) {
 				return false;
 			}
+			// 为给定类创建新的 AnnotatedBeanDefinition
 			metadata = AnnotationMetadata.introspect(beanClass);
 		}
 		else {
 			try {
+				// 获取 className 的 MetadataReader 实例
 				MetadataReader metadataReader = metadataReaderFactory.getMetadataReader(className);
 				metadata = metadataReader.getAnnotationMetadata();
 			}
@@ -122,11 +131,14 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+		// 获取 bean 定义的元数据被 @Configuration 注解标注的属性字典值
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		// 如果 bean 被 @Configuration 注解标注, 并且 proxyBeanMethods 为 false (代理模式), 则将 bean 定义标记为 full
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
-		else if (config != null || isConfigurationCandidate(metadata)) {
+		// 如果 bean 被 @Configuration 注解标注, 并且标注 @Component @ComponentScan @Import @ImportResource 或者 @Bean 标记方法,则将 bean 定义标记 lite
+		else if (config != null || isConfigurationCandidate(metadata)) { // isConfigurationCandidate 是否是候选配置
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
@@ -134,6 +146,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+		// 获取排序值
 		Integer order = getOrder(metadata);
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
@@ -156,6 +169,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// Any of the typical annotations found?
+		// 检查是否被注解 @Component @ComponentScan @Import @ImportResource 标注
 		for (String indicator : candidateIndicators) {
 			if (metadata.isAnnotated(indicator)) {
 				return true;
@@ -163,6 +177,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// Finally, let's look for @Bean methods...
+		// 最后检查是否有 @Bean 标注的方法
 		return hasBeanMethods(metadata);
 	}
 
